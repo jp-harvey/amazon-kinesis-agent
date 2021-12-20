@@ -15,6 +15,7 @@ package com.amazon.kinesis.streaming.agent.processing.processors;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,8 @@ import com.amazon.kinesis.streaming.agent.processing.exceptions.DataConversionEx
 import com.amazon.kinesis.streaming.agent.processing.interfaces.IDataConverter;
 import com.amazon.kinesis.streaming.agent.processing.interfaces.IJSONPrinter;
 import com.amazon.kinesis.streaming.agent.processing.utils.ProcessingUtilsFactory;
+
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Convert a CSV record into JSON record.
@@ -51,16 +54,19 @@ public class CSVToJSONDataConverter implements IDataConverter {
     private static String FIELDS_KEY = "customFieldNames";
     private static String DELIMITER_KEY = "delimiter";
     private static String IGNORED_FIELDS_KEY = "ignoredFieldNames";
+    private static String ENCODED_FIELDS_KEY = "encodedFieldNames";
     private final List<String> fieldNames;
     private final String delimiter;
     private final IJSONPrinter jsonProducer;
     private final List<String> ignoredFieldNames;
+    private final List<String> encodedFieldNames;
 
     public CSVToJSONDataConverter(Configuration config) {
         fieldNames = config.readList(FIELDS_KEY, String.class);
         delimiter = config.readString(DELIMITER_KEY, ",");
         jsonProducer = ProcessingUtilsFactory.getPrinter(config);
         ignoredFieldNames = config.readList(IGNORED_FIELDS_KEY, String.class, Collections.<String>emptyList());
+        encodedFieldNames = config.readList(ENCODED_FIELDS_KEY, String.class, Collections.<String>emptyList());
     }
 
     @Override
@@ -90,9 +96,25 @@ public class CSVToJSONDataConverter implements IDataConverter {
             recordMap.remove(fieldName);
         }
 
+        try {
+            for (String fieldName : encodedFieldNames) {
+                String value = recordMap.get(fieldName).toString();
+                String hash = toMD5(value);
+                recordMap.put(fieldName, hash);
+            }
+        } catch (Exception e) {
+            throw new DataConversionException("Unable to parse records.", e);
+        }
+
         String dataJson = jsonProducer.writeAsString(recordMap) + NEW_LINE;
         
         return ByteBuffer.wrap(dataJson.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String toMD5(String data) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
+        return DatatypeConverter.printHexBinary(hash);
     }
 
     @Override
