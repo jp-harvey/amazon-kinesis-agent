@@ -107,7 +107,7 @@ download_dependencies() {
                   com.amazonaws:aws-java-sdk-ec2:${aws_java_sdk_version} \
                   com.fasterxml.jackson.core:jackson-annotations:2.10.3\
                   com.fasterxml.jackson.core:jackson-core:2.10.3 \
-                  com.fasterxml.jackson.core:jackson-databind:2.10.3 \
+                  com.fasterxml.jackson.core:jackson-databind:2.10.5.1 \
                   com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.10.3 \
                   com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.10.3 \
                   com.google.code.findbugs:jsr305:3.0.1 \
@@ -123,10 +123,10 @@ download_dependencies() {
                   commons-logging:commons-logging-adapters:1.1 \
                   commons-logging:commons-logging-api:1.1 \
                   org.apache.commons:commons-lang3:3.4 \
-                  org.apache.logging.log4j:log4j-1.2-api:2.13.2 \
-                  org.apache.logging.log4j:log4j-api:2.13.2 \
-                  org.apache.logging.log4j:log4j-core:2.13.2 \
-                  org.apache.logging.log4j:log4j-slf4j-impl:2.13.2 \
+                  org.apache.logging.log4j:log4j-1.2-api:2.16.0 \
+                  org.apache.logging.log4j:log4j-api:2.16.0 \
+                  org.apache.logging.log4j:log4j-core:2.16.0 \
+                  org.apache.logging.log4j:log4j-slf4j-impl:2.16.0 \
                   org.slf4j:slf4j-api:1.7.12 \
                   com.beust:jcommander:1.48 \
                   org.xerial:sqlite-jdbc:3.20.1 \
